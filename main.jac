@@ -28,7 +28,10 @@ def:pub add_todo(title: str) -> dict {
 
 """Get all todos."""
 def:pub get_todos -> list {
-    return [{"id": t.id, "title": t.title, "done": t.done} for t in [root-->](`?Todo)];
+    return [
+        {"id": t.id, "title": t.title, "done": t.done, "category": t.category}
+        for t in [root-->](`?Todo)
+    ];
 }
 
 """Toggle a todo's done status."""
@@ -36,7 +39,10 @@ def:pub toggle_todo(id: str) -> dict {
     for todo in [root-->](`?Todo) {
         if todo.id == id {
             todo.done = not todo.done;
-            return {"id": todo.id, "title": todo.title, "done": todo.done};
+            return {
+                "id": todo.id, "title": todo.title,
+                "done": todo.done, "category": todo.category
+            };
         }
     }
     return {};
@@ -73,7 +79,10 @@ cl def:pub app -> any {
         await toggle_todo(id);
         items = items.map(
             lambda t: any -> any {
-                return {"id": t.id, "title": t.title, "done": not t.done}
+                return {
+                    "id": t.id, "title": t.title,
+                    "done": not t.done, "category": t.category
+                }
                 if t.id == id else t;
             }
         );
@@ -111,6 +120,7 @@ cl def:pub app -> any {
                     <span class={"todo-title " + ("todo-done" if t.done else "")}>
                         {t.title}
                     </span>
+                    <span class="category">{t.category}</span>
                     <button
                         class="btn-delete"
                         onClick={lambda -> None { remove(t.id); }}
