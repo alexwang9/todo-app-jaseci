@@ -62,7 +62,10 @@ node Todo {
     has id: str,
         title: str,
         completed: bool = False,
-        category: str = "other";
+        category: str = "other",
+        priority: str = "medium",
+        effort: str = "moderate",
+        subtasks: list = [];
 }
 
 node MealIngredient {
@@ -80,16 +83,23 @@ walker:priv AddTodo {
 
     can create with `root entry {
         category = str(categorize(self.title)).split(".")[-1].lower();
+        priority = str(suggest_priority(self.title)).split(".")[-1].lower();
+        effort = str(estimate_effort(self.title)).split(".")[-1].lower();
         new_todo = here ++> Todo(
             id=str(uuid4()),
             title=self.title,
-            category=category
+            category=category,
+            priority=priority,
+            effort=effort
         );
         report {
             "id": new_todo[0].id,
             "title": new_todo[0].title,
             "completed": new_todo[0].completed,
-            "category": new_todo[0].category
+            "category": new_todo[0].category,
+            "priority": new_todo[0].priority,
+            "effort": new_todo[0].effort,
+            "subtasks": new_todo[0].subtasks
         };
     }
 }
@@ -106,7 +116,10 @@ walker:priv ListTodos {
             "id": here.id,
             "title": here.title,
             "completed": here.completed,
-            "category": here.category
+            "category": here.category,
+            "priority": here.priority,
+            "effort": here.effort,
+            "subtasks": here.subtasks
         });
     }
 
