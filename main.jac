@@ -4,6 +4,10 @@ cl import "./styles.css";
 
 glob llm = Model(model_name="claude-sonnet-4-20250514");
 
+enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
+
+def categorize(title: str) -> Category by llm();
+
 # A node is a persistent data container in the graph
 node Todo {
     has id: str,
