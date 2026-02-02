@@ -15,7 +15,10 @@ impl app.addTodo -> None {
         "id": newTodo.id,
         "title": newTodo.title,
         "completed": newTodo.completed,
-        "category": newTodo.category
+        "category": newTodo.category,
+        "priority": newTodo.priority,
+        "effort": newTodo.effort,
+        "subtasks": newTodo.subtasks
     }]);
     newTodoText = "";
 }
@@ -27,7 +30,8 @@ impl app.toggleTodo(todoId: str) -> None {
             if t.id == todoId {
                 return {
                     "id": t.id, "title": t.title,
-                    "completed": not t.completed, "category": t.category
+                    "completed": not t.completed, "category": t.category,
+                    "priority": t.priority, "effort": t.effort, "subtasks": t.subtasks
                 };
             }
             return t;
@@ -39,6 +43,55 @@ impl app.deleteTodo(todoId: str) -> None {
     root spawn DeleteTodo(todo_id=todoId);
     todos = todos.filter(
         lambda t: any -> bool { return t.id != todoId; }
+    );
+}
+
+impl app.breakDownTask(todoId: str) -> None {
+    response = root spawn BreakDownTask(todo_id=todoId);
+    if response.reports and response.reports.length > 0 {
+        result = response.reports[0];
+        todos = todos.map(
+            lambda t: any -> any {
+                if t.id == todoId {
+                    return {
+                        "id": t.id, "title": t.title,
+                        "completed": t.completed, "category": t.category,
+                        "priority": t.priority, "effort": t.effort,
+                        "subtasks": result.subtasks
+                    };
+                }
+                return t;
+            }
+        );
+    }
+}
+
+impl app.toggleSubtask(todoId: str, subtaskId: str) -> None {
+    root spawn ToggleSubtask(todo_id=todoId, subtask_id=subtaskId);
+    todos = todos.map(
+        lambda t: any -> any {
+            if t.id == todoId {
+                subtasks = t.subtasks.map(
+                    lambda s: any -> any {
+                        if s.id == subtaskId {
+                            return {
+                                "id": s.id,
+                                "title": s.title,
+                                "completed": not s.completed
+                            };
+                        }
+                        return s;
+                    }
+                );
+                return {
+                    "id": t.id, "title": t.title,
+                    "completed": t.completed, "category": t.category,
+                    "priority": t.priority, "effort": t.effort,
+                    "subtasks": subtasks
+                };
+            }
+            return t;
+        }
     );
 }
 

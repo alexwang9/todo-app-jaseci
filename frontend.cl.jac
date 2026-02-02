@@ -10,6 +10,7 @@ import from .components.IngredientItem { IngredientItem }
 
 sv import from main {
     AddTodo, ListTodos, ToggleTodo, DeleteTodo,
+    BreakDownTask, ToggleSubtask,
     GenerateShoppingList, ListMealPlan, ClearMealPlan
 }
 
@@ -45,6 +46,8 @@ def:pub app -> any {
     async def addTodo -> None;
     async def toggleTodo(todoId: str) -> None;
     async def deleteTodo(todoId: str) -> None;
+    async def breakDownTask(todoId: str) -> None;
+    async def toggleSubtask(todoId: str, subtaskId: str) -> None;
     async def handleLogin -> None;
     async def handleSignup -> None;
     def handleLogout -> None;
@@ -75,7 +78,7 @@ def:pub app -> any {
                             <div>
                                 <h1 className="app-title">TaskFlow</h1>
                                 <p className="app-subtitle">
-                                    Todo list with AI meal planning
+                                    AI-powered todos with smart priorities and task breakdown
                                 </p>
                             </div>
                             <button onClick={handleLogout} className="btn-signout">
@@ -120,6 +123,8 @@ def:pub app -> any {
                                                         todo={todo}
                                                         onToggle={toggleTodo}
                                                         onDelete={deleteTodo}
+                                                        onBreakDown={breakDownTask}
+                                                        onToggleSubtask={toggleSubtask}
                                                     /> for todo in todos
                                                 ]}
                                             </div>
