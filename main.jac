@@ -18,7 +18,17 @@ glob llm = Model(model_name="claude-sonnet-4-20250514");
 
 enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
 
+enum Priority { HIGH, MEDIUM, LOW }
+
+enum Effort { QUICK, MODERATE, SIGNIFICANT }
+
 enum Unit { PIECE, LB, OZ, CUP, TBSP, TSP, CLOVE, BUNCH }
+
+obj Subtask {
+    has id: str;
+    has title: str;
+    has completed: bool;
+}
 
 obj Ingredient {
     has name: str;
@@ -36,6 +46,15 @@ def categorize(title: str) -> Category by llm();
 
 """Generate a shopping list of ingredients needed for a described meal."""
 def generate_ingredients(meal_description: str) -> list[Ingredient] by llm();
+
+"""Break down a complex task into 3-5 actionable subtasks."""
+def break_down_task(title: str) -> list[str] by llm();
+
+"""Suggest the priority level for a task based on keywords and context."""
+def suggest_priority(title: str) -> Priority by llm();
+
+"""Estimate the effort required for a task."""
+def estimate_effort(title: str) -> Effort by llm();
 
 # --- Data Nodes ---
 
