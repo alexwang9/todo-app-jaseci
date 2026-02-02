@@ -40,3 +40,73 @@ def:pub delete_todo(id: str) -> dict {
     }
     return {};
 }
+
+cl def:pub app -> any {
+    has items: list = [],
+        text: str = "";
+
+    async can with entry {
+        items = await get_todos();
+    }
+
+    async def add -> None {
+        if text.trim() {
+            todo = await add_todo(text.trim());
+            items = items.concat([todo]);
+            text = "";
+        }
+    }
+
+    async def toggle(id: str) -> None {
+        await toggle_todo(id);
+        items = items.map(
+            lambda t: any -> any {
+                return {"id": t.id, "title": t.title, "done": not t.done}
+                if t.id == id else t;
+            }
+        );
+    }
+
+    async def remove(id: str) -> None {
+        await delete_todo(id);
+        items = items.filter(lambda t: any -> bool { return t.id != id; });
+    }
+
+    remaining = items.filter(lambda t: any -> bool { return not t.done; }).length;
+
+    return
+        <div class="container">
+            <h1>Todo App</h1>
+            <div class="input-row">
+                <input
+                    class="input"
+                    value={text}
+                    onChange={lambda e: any -> None { text = e.target.value; }}
+                    onKeyPress={lambda e: any -> None {
+                        if e.key == "Enter" { add(); }
+                    }}
+                    placeholder="What needs to be done?"
+                />
+                <button class="btn-add" onClick={add}>Add</button>
+            </div>
+            {[
+                <div key={t.id} class="todo-item">
+                    <input
+                        type="checkbox"
+                        checked={t.done}
+                        onChange={lambda -> None { toggle(t.id); }}
+                    />
+                    <span class={"todo-title " + ("todo-done" if t.done else "")}>
+                        {t.title}
+                    </span>
+                    <button
+                        class="btn-delete"
+                        onClick={lambda -> None { remove(t.id); }}
+                    >
+                        X
+                    </button>
+                </div> for t in items
+            ]}
+            <div class="count">{remaining} items remaining</div>
+        </div>;
+}
