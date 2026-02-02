@@ -12,13 +12,18 @@ def categorize(title: str) -> Category by llm();
 node Todo {
     has id: str,
         title: str,
-        done: bool = False;
+        done: bool = False,
+        category: str = "other";
 }
 
-"""Add a todo and return it."""
+"""Add a todo with AI categorization."""
 def:pub add_todo(title: str) -> dict {
-    todo = root ++> Todo(id=str(uuid4()), title=title);
-    return {"id": todo[0].id, "title": todo[0].title, "done": todo[0].done};
+    category = str(categorize(title)).split(".")[-1].lower();
+    todo = root ++> Todo(id=str(uuid4()), title=title, category=category);
+    return {
+        "id": todo[0].id, "title": todo[0].title,
+        "done": todo[0].done, "category": todo[0].category
+    };
 }
 
 """Get all todos."""
