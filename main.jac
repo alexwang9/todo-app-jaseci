@@ -89,3 +89,29 @@ walker:priv ListTodos {
         report self.todos;
     }
 }
+
+walker:priv ToggleTodo {
+    has todo_id: str;
+
+    can search with `root entry { visit [-->]; }
+
+    can toggle with Todo entry {
+        if here.id == self.todo_id {
+            here.completed = not here.completed;
+            report {"id": here.id, "completed": here.completed};
+        }
+    }
+}
+
+walker:priv DeleteTodo {
+    has todo_id: str;
+
+    can search with `root entry { visit [-->]; }
+
+    can delete with Todo entry {
+        if here.id == self.todo_id {
+            del here;
+            report {"deleted": self.todo_id};
+        }
+    }
+}
