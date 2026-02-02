@@ -6,15 +6,15 @@ glob llm = Model(model_name="claude-sonnet-4-20250514");
 
 enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
 
-def categorize(title: str) -> Category by llm();
-
-# A node is a persistent data container in the graph
 node Todo {
     has id: str,
         title: str,
         done: bool = False,
         category: str = "other";
 }
+
+"""Categorize a todo based on its title."""
+def categorize(title: str) -> Category by llm();
 
 """Add a todo with AI categorization."""
 def:pub add_todo(title: str) -> dict {
@@ -97,7 +97,7 @@ cl def:pub app -> any {
 
     return
         <div class="container">
-            <h1>Todo App</h1>
+            <h1>AI Todo App</h1>
             <div class="input-row">
                 <input
                     class="input"
