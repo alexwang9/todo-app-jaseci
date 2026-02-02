@@ -49,3 +49,43 @@ def categorize(title: str) -> Category by llm();
 
 """Generate a shopping list of ingredients needed for a described meal."""
 def generate_ingredients(meal_description: str) -> list[Ingredient] by llm();
+
+walker:priv AddTodo {
+    has title: str;
+
+    can create with `root entry {
+        category = str(categorize(self.title)).split(".")[-1].lower();
+        new_todo = here ++> Todo(
+            id=str(uuid4()),
+            title=self.title,
+            category=category
+        );
+        report {
+            "id": new_todo[0].id,
+            "title": new_todo[0].title,
+            "completed": new_todo[0].completed,
+            "category": new_todo[0].category
+        };
+    }
+}
+
+walker:priv ListTodos {
+    has todos: list = [];
+
+    can collect with `root entry {
+        visit [-->];
+    }
+
+    can gather with Todo entry {
+        self.todos.append({
+            "id": here.id,
+            "title": here.title,
+            "completed": here.completed,
+            "category": here.category
+        });
+    }
+
+    can report_all with `root exit {
+        report self.todos;
+    }
+}
