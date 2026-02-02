@@ -31,13 +31,57 @@ my-todo/
 └── .jac/                       # Build output (generated)
 ```
 
-## Getting Started
+## Installation and Setup
 
-Start the development server:
+### Prerequisites
 
-```bash
-jac start main.jac
-```
+- **Jac** - Install the Jac language runtime
+- **Node.js** - Required for client-side dependencies (v18 or higher recommended)
+- **Anthropic API Key** - Required for AI features (priority detection, task breakdown, etc.)
+
+### Installation Steps
+
+1. **Clone or navigate to the project directory:**
+   ```bash
+   cd /path/to/my-todo
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   jac install
+   ```
+   This will install both Jac dependencies and npm packages for the client-side components.
+
+3. **Set up your Anthropic API key:**
+
+   The application uses Claude AI for task categorization, priority detection, and task breakdown. You need to set your Anthropic API key as an environment variable:
+
+   ```bash
+   export ANTHROPIC_API_KEY="your-api-key-here"
+   ```
+
+   Or create a `.env` file in the project root:
+   ```
+   ANTHROPIC_API_KEY=your-api-key-here
+   ```
+
+4. **Start the development server:**
+   ```bash
+   jac start main.jac
+   ```
+
+5. **Access the application:**
+
+   Open your browser and navigate to the URL shown in the terminal (typically `http://localhost:8000`)
+
+### First-Time Usage
+
+1. Click "Sign up here" to create a new account
+2. Enter a username and password (minimum 4 characters)
+3. Once logged in, you can:
+   - Add todos (they'll automatically get priority and effort estimates)
+   - Click the 💡 button on any task to break it down into subtasks
+   - Use the meal planner to generate shopping lists
 
 ## Custom Features
 
