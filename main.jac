@@ -161,6 +161,59 @@ walker:priv DeleteTodo {
     }
 }
 
+walker:priv BreakDownTask {
+    has todo_id: str;
+
+    can search with `root entry {
+        visit [-->];
+    }
+
+    can breakdown with Todo entry {
+        if here.id == self.todo_id {
+            subtask_titles = break_down_task(here.title);
+            subtasks: list = [];
+            for title in subtask_titles {
+                subtask = {
+                    "id": str(uuid4()),
+                    "title": title,
+                    "completed": False
+                };
+                subtasks.append(subtask);
+            }
+            here.subtasks = subtasks;
+            report {
+                "id": here.id,
+                "subtasks": here.subtasks
+            };
+        }
+    }
+}
+
+walker:priv ToggleSubtask {
+    has todo_id: str;
+    has subtask_id: str;
+
+    can search with `root entry {
+        visit [-->];
+    }
+
+    can toggle with Todo entry {
+        if here.id == self.todo_id {
+            for subtask in here.subtasks {
+                if subtask["id"] == self.subtask_id {
+                    subtask["completed"] = not subtask["completed"];
+                    report {
+                        "todo_id": here.id,
+                        "subtask_id": self.subtask_id,
+                        "completed": subtask["completed"]
+                    };
+                    break;
+                }
+            }
+        }
+    }
+}
+
 # --- Meal Planner Walkers ---
 
 walker:priv GenerateShoppingList {
