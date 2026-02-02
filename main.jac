@@ -14,20 +14,7 @@ import from uuid { uuid4 }
 
 glob llm = Model(model_name="claude-sonnet-4-20250514");
 
-node Todo {
-    has id: str,
-        title: str,
-        completed: bool = False,
-        category: str = "other";
-}
-
-node MealIngredient {
-    has name: str,
-        quantity: float,
-        unit: str,
-        cost: float,
-        carby: bool;
-}
+# --- AI Types ---
 
 enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
 
@@ -49,6 +36,25 @@ def categorize(title: str) -> Category by llm();
 
 """Generate a shopping list of ingredients needed for a described meal."""
 def generate_ingredients(meal_description: str) -> list[Ingredient] by llm();
+
+# --- Data Nodes ---
+
+node Todo {
+    has id: str,
+        title: str,
+        completed: bool = False,
+        category: str = "other";
+}
+
+node MealIngredient {
+    has name: str,
+        quantity: float,
+        unit: str,
+        cost: float,
+        carby: bool;
+}
+
+# --- Todo Walkers ---
 
 walker:priv AddTodo {
     has title: str;
@@ -93,12 +99,17 @@ walker:priv ListTodos {
 walker:priv ToggleTodo {
     has todo_id: str;
 
-    can search with `root entry { visit [-->]; }
+    can search with `root entry {
+        visit [-->];
+    }
 
     can toggle with Todo entry {
         if here.id == self.todo_id {
             here.completed = not here.completed;
-            report {"id": here.id, "completed": here.completed};
+            report {
+                "id": here.id,
+                "completed": here.completed
+            };
         }
     }
 }
@@ -106,7 +117,9 @@ walker:priv ToggleTodo {
 walker:priv DeleteTodo {
     has todo_id: str;
 
-    can search with `root entry { visit [-->]; }
+    can search with `root entry {
+        visit [-->];
+    }
 
     can delete with Todo entry {
         if here.id == self.todo_id {
@@ -115,6 +128,8 @@ walker:priv DeleteTodo {
         }
     }
 }
+
+# --- Meal Planner Walkers ---
 
 walker:priv GenerateShoppingList {
     has meal_description: str;
@@ -153,20 +168,29 @@ walker:priv GenerateShoppingList {
 walker:priv ListMealPlan {
     has ingredients: list = [];
 
-    can collect with `root entry { visit [-->]; }
+    can collect with `root entry {
+        visit [-->];
+    }
 
     can gather with MealIngredient entry {
         self.ingredients.append({
-            "name": here.name, "quantity": here.quantity,
-            "unit": here.unit, "cost": here.cost, "carby": here.carby
+            "name": here.name,
+            "quantity": here.quantity,
+            "unit": here.unit,
+            "cost": here.cost,
+            "carby": here.carby
         });
     }
 
-    can report_all with `root exit { report self.ingredients; }
+    can report_all with `root exit {
+        report self.ingredients;
+    }
 }
 
 walker:priv ClearMealPlan {
-    can collect with `root entry { visit [-->]; }
+    can collect with `root entry {
+        visit [-->];
+    }
 
     can clear with MealIngredient entry {
         del here;

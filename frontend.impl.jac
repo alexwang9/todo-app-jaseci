@@ -1,3 +1,5 @@
+"""Implementations for the Todo App frontend component."""
+
 impl app.fetchTodos -> None {
     todosLoading = True;
     result = root spawn ListTodos();
@@ -88,6 +90,19 @@ impl app.handleLogout -> None {
     mealInput = "";
 }
 
+impl app.handleSubmit(e: any) -> None {
+    e.preventDefault();
+    if isSignup {
+        await handleSignup();
+    } else {
+        await handleLogin();
+    }
+}
+
+impl app.handleTodoKeyPress(e: any) -> None {
+    if e.key == "Enter" { addTodo(); }
+}
+
 impl app.fetchMealPlan -> None {
     result = root spawn ListMealPlan();
     ingredients = result.reports[0] if result.reports else [];
@@ -107,22 +122,14 @@ impl app.clearIngredients -> None {
     mealInput = "";
 }
 
-impl app.handleSubmit(e: any) -> None {
-    e.preventDefault();
-    if isSignup { await handleSignup(); }
-    else { await handleLogin(); }
-}
-
-impl app.handleTodoKeyPress(e: any) -> None {
-    if e.key == "Enter" { addTodo(); }
-}
-
 impl app.handleMealKeyPress(e: any) -> None {
     if e.key == "Enter" { generateIngredients(); }
 }
 
 impl app.getIngredientsTotal -> float {
     total = 0.0;
-    for ing in ingredients { total = total + ing.cost; }
+    for ing in ingredients {
+        total = total + ing.cost;
+    }
     return total;
 }
